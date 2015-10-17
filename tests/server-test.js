@@ -22,6 +22,7 @@ function createWebsocketClient(url, thenDo) {
   };
   client.onmessage = function(e) { console.log(e); };
   client.sendJSON = function(json, thenDo) {
+    json.sender = "client";
     client.send(JSON.stringify(json));
     thenDo && thenDo();
   };
@@ -34,21 +35,14 @@ var port = 9010;
 
 describe('server', function() {
 
-  var client;
+  var client, serverMsger;
 
   before(() => evaluator.wrapModuleLoad());
   beforeEach(done => {
     lang.fun.composeAsync(
       n => lang.fun.waitFor(() => !state.server, n),
       n => server.startServer({port: port}, n),
-      (serverState, n) => {
-        state.server = serverState;
-        state.server.httpServer.on("close", () => {
-          console.log("server closed");
-          state.server = null;
-        });
-        n();
-      },
+      (msger, n) => { serverMsger = msger; n(); },
       n => createWebsocketClient("ws://0.0.0.0:" + port, n),
       (_client, n) => { client = _client; state.clients.push(_client); n();  }
     )(done);
@@ -56,8 +50,7 @@ describe('server', function() {
 
   afterEach(done => {
     state.clients.forEach(ea => ea.close());
-    server.closeServer(state.server);
-    lang.fun.waitFor(1000, () => !state.server, done)
+    serverMsger.close(done);
     delete require.cache[require.resolve("./some-module")];
   });
 
