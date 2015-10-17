@@ -1,12 +1,61 @@
-# nodejs-live-eval
+# nodejs-code-pump
 
-nodejs evaluation support, in particular but not only for LivelyWeb. Uses
-[lively.vm](https://github.com/LivelyKernel/lively.vm) package for eval and
-source transform support
+nodejs code injection and extraction. Can evaluate in the context of modules.
+Also supports nodejs process creation for "workspace processes". Controlled
+either directly via the evaluator / process interfaces or via websockets. Ws
+server is part of the package.
+
+Used in particular but not only for [Lively Web](http://lively-web.org).
+
+Basic eval / source transform mechanism is based on
+[lively.vm](https://github.com/LivelyKernel/lively.vm).
+
 
 ## Usage
 
 FILL-ME-OUT
+
+### evaluator
+
+```js
+var e = require("nodejs-code-pump").evaluator;
+e.evalIn("./some-module", "internalState.of.module"); // => whatever is stored in there
+```
+
+
+### child process
+
+```js
+var p = require("nodejs-code-pump").process;
+p.startNodejsWorkspace({}, (err, procMgr) => {
+  procMgr.sendToChild("eval", {code: "1+2"}, (err, answer) {
+    console.log(answer.data.value); // => 3
+  });
+});
+
+```
+
+### websockets
+
+server:
+
+```js
+var s = require("nodejs-code-pump").server;
+server.startServer({port: 9009});
+```
+
+client:
+
+```js
+var ws = new WebSocketClient("ws://localhost:9009/");
+ws.send(JSON.stringify({
+  action: "eval",
+  data: {module: "./tests/some-module", code: '3 + 4 + internalState'}
+}));
+ws.onmessage(function(e) {
+  JSON.parse(e.data).data.value; // => 30
+});
+```
 
 ## License
 
