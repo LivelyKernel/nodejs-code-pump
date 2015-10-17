@@ -20,11 +20,7 @@ function createWebsocketClient(url, thenDo) {
     console.log('echo-protocol Client Closed');
     lang.arr.remove(state.clients, client);
   };
-  client.onmessage = function(e) {
-    if (typeof e.data === 'string') {
-      console.log("Received: '" + e.data + "'");
-    }
-  };
+  client.onmessage = function(e) { console.log(e); };
   client.sendJSON = function(json, thenDo) {
     client.send(JSON.stringify(json));
     thenDo && thenDo();
@@ -38,8 +34,9 @@ var port = 9010;
 
 describe('server', function() {
 
-  before(() => evaluator.wrapModuleLoad());
+  var client;
 
+  before(() => evaluator.wrapModuleLoad());
   beforeEach(done => {
     lang.fun.composeAsync(
       n => lang.fun.waitFor(() => !state.server, n),
@@ -53,7 +50,7 @@ describe('server', function() {
         n();
       },
       n => createWebsocketClient("ws://0.0.0.0:" + port, n),
-      (client, n) => { state.clients.push(client); n();  }
+      (_client, n) => { client = _client; state.clients.push(_client); n();  }
     )(done);
   });
 
@@ -64,17 +61,30 @@ describe('server', function() {
     delete require.cache[require.resolve("./some-module")];
   });
 
-  it("brings up server and client", function(done) {
-    var client = state.clients[0];
+  it("can require a module", function(done) {
     lang.fun.composeAsync(
-      n => client.sendJSON({action: "eval", data: {code: 'require("./tests/some-module")'}}, n),
-      n => setTimeout(n, 400),
+      n => {
+        client.onmessage = (e) => n();
+        client.sendJSON({action: "eval", data: {code: 'require("./tests/some-module")'}})
+      },
       n => { expect(global.someModuleGlobal).equals(99, "test module not loaded"); n(); }
     )(done);
+  });
 
-    // expect(evaluator.envFor("./some-module"))
-    //   .deep.property("recorder.internalState")
-    //   .equals(23);
+  it("evals inside a module", function(done) {
+    lang.fun.composeAsync(
+      n => {
+        client.onmessage = (e) => n(null, e.data);
+        client.sendJSON({
+          action: "eval",
+          data: {module: "./tests/some-module", code: 'internalState'}
+        });
+      },
+      (answer, n) => {
+        expect(JSON.parse(answer).data.value).equals(23, "internalState variable not matching");
+        n();
+      }
+    )(done);
   });
 
 });

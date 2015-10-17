@@ -11,41 +11,50 @@ var fs = require("fs");
 var liveEval = require("../index");
 var p = liveEval.process;
 
+
 describe('process', function() {
 
-  it("starts new nodejs process", function(done) {
-    lang.fun.composeAsync(
-      p.runNode.bind(null, "console.log('test');"),
-      (p, n) => p.process.once("close", function() { n(null, p)}),
-      (p, n) => {
-        expect(p.running).equals(false);
-        expect(p.readLogSync()).equals("test\n");
-        n();
-      }
-    )(done);
+  var procMessenger;
+  afterEach(done => procMessenger.close(done));
+
+  describe("start / stop", () => {
+
+    it("starts nodejs and runs code", done => {
+      lang.fun.composeAsync(
+        n => procMessenger = p.startNodejsProcess({code: "console.log('test');"}, n),
+        (p, n) => lang.fun.waitFor(() => !p.isOnline(), n),
+        n => procMessenger.readLog(n),
+        (logBuf, n) => { expect(logBuf.toString()).equals("test\n"); n(); }
+      )(done);
+    });
+
+    it("starts nodejs on a module", done => {
+      lang.fun.composeAsync(
+        n => procMessenger = p.startNodejsProcess({module: "./some-module.js"}, n),
+        (p, n) => lang.fun.waitFor(() => !p.isOnline(), n),
+        n => procMessenger.readLog(n),
+        (logBuf, n) => { expect(logBuf.toString()).equals("running some-module\n"); n(); }
+      )(done);
+    });
+
   });
 
-  it("starts nodejs process on module", function(done) {
-    lang.fun.composeAsync(
-      p.runNodeOn.bind(null, "./some-module.js"),
-      (p,n) => p.process.once("close", function() { n(null, p)}),
-      (p,n) => p.readLog(n),
-      (logBuffer, n) => { expect(logBuffer.toString()).equals("running some-module\n"); n(); }
-    )(done);
+  describe("run code", () => {
+
+    it("evals in context of loaded module", function(done) {
+      var proc, evalResult;
+      lang.fun.composeAsync(
+        n => procMessenger = p.startNodejsWorkspace({}, n),
+        (_, n) => setTimeout(n ,500),
+        n => procMessenger.sendToChild("eval", {code: "1+2"}, n),
+        (answer, n) => {
+          expect(answer).deep.property("data.value").equals(3);
+          n();
+        }
+      )(done);
+    });
+    
   });
 
-  it("evals in context of loaded module", function(done) {
-    var proc, evalResult;
-    lang.fun.composeAsync(
-      p.runNodeOn.bind(null, "./some-module.js", [], {silent: true, isWorkspace: true}),
-      (p,n) =>  { proc = p ; p.sendEval('console.log(internalState);', n); },
-      (evalR, n) => { evalResult = evalR; proc.stop(n); },
-      (n) => proc.readLog(n),
-      (logBuffer, n) => {
-        expect(evalResult.isError).equals(false, evalResult.value);
-        expect(logBuffer.toString()).equals("running some-module\n23\n");
-        n(); }
-    )(done);
-  });
 
 });
