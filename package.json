@@ -24,7 +24,8 @@
     "lively.lang": "^0.4",
     "lively.vm": "^0.1.2",
     "node-uuid": "^1.4.3",
-    "temp": "^0.8.3"
+    "temp": "^0.8.3",
+    "websocket": "^1.0.22"
   },
   "devDependencies": {
     "chai": "^3.3.0",

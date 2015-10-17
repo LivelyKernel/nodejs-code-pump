@@ -7,7 +7,11 @@ function someFunction() {
 console.log("running some-module");
 
 var internalState = 23;
+var externalState = 42;
+
+global.someModuleGlobal = 99;
 
 module.exports = {
-  foo: someFunction
+  foo: someFunction,
+  state: externalState
 }
