@@ -1,0 +1,34 @@
+{
+  "name": "nodejs-live-eval",
+  "version": "0.1.0",
+  "description": "eval / \"repl\" support for nodejs (particular in combination with LivelyWeb)",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha tests/*-test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LivelyKernel/nodejs-live-eval.git"
+  },
+  "keywords": [
+    "LivelyWeb"
+  ],
+  "author": "Robert Krahn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LivelyKernel/nodejs-live-eval/issues"
+  },
+  "homepage": "https://github.com/LivelyKernel/nodejs-live-eval#readme",
+  "dependencies": {
+    "callsite": "^1.0.0",
+    "lively.lang": "^0.4",
+    "lively.vm": "^0.1.2",
+    "node-uuid": "^1.4.3",
+    "temp": "^0.8.3"
+  },
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "chai-subset": "^1.1.0",
+    "mocha": "^2.3.3"
+  }
+}
