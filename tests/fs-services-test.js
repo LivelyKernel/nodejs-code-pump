@@ -56,13 +56,26 @@ describe('fs-services', function() {
     });
   });
 
-  it("can read file", done => {
-    expect(false).to.be.true;
-    done();
+  it("can find the current directory", done => {
+    fsServices.cwd((err, cwd) => {
+      expect(process.cwd()).equal(cwd);
+      done();
+    })
   });
-  
+
+  it("can read file", done => {
+    fsServices.readFile(file2, (err, content) => {
+      expect(content).to.equal("bar.baz();\n");
+      done();
+    });
+  });
+
   it("can write files", done => {
-    expect(false).to.be.true;
-    done();
+    fsServices.writeFile(file2, "foo.uh()", (err) => {
+      fsServices.readFile(file2, (err, content) => {
+        expect(content).to.equal("foo.uh()");
+        done();
+      });
+    });
   });
 });
