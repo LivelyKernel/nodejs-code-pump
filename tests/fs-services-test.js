@@ -41,15 +41,13 @@ describe('fs-services', function() {
   });
 
   it("finds JS files in dir", done => {
-    var expected = [file1, file2, file3, file5]
-      .map((f) => path.relative(baseDir, f));
     fsServices.findJSFiles(baseDir, (err, files) => {
-      expect(files).to
-        .have.length(expected.length)
-        .include(expected[0])
-        .include(expected[1])
-        .include(expected[2])
-        .include(expected[3])
+      expect(files).to.to.deep.equal([
+        {fileName: path.relative(baseDir, file3), path: file3},
+        {fileName: path.relative(baseDir, file2), path: file2},
+        {fileName: path.relative(baseDir, file5), path: file5},
+        {fileName: path.relative(baseDir, file1), path: file1}
+      ]);
       done(err);
     });
   });
@@ -73,6 +71,29 @@ describe('fs-services', function() {
       fsServices.readFile(file2, (err, content) => {
         expect(content).to.equal("foo.uh()");
         done();
+      });
+    });
+  });
+
+  it("can create files", done => {
+    var newFile = j(dir3, "new-file.js");
+    fsServices.writeFile(newFile, "oy.oy()", (err) => {
+      fsServices.readFile(newFile, (err, content) => {
+        expect(content).to.equal("oy.oy()");
+        done();
+      });
+    });
+  });
+
+  it("can delete files", done => {
+    fsServices.removeFile(file5, (err) => {
+      fsServices.findJSFiles(baseDir, (err, files) => {
+        expect(files).to.to.deep.equal([
+          {fileName: path.relative(baseDir, file3), path: file3},
+          {fileName: path.relative(baseDir, file2), path: file2},
+          {fileName: path.relative(baseDir, file1), path: file1}
+        ]);
+        done(err);
       });
     });
   });
