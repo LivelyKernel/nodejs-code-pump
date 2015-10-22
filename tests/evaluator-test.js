@@ -1,11 +1,9 @@
 /*global require, process, before, beforeEach, afterEach, describe, it, expect, global*/
 
-var isCommonJS = typeof module !== "undefined" && module.require;
-var chai = isCommonJS ? module.require("chai") : window.chai;
-var chaiSubset = isCommonJS ? module.require("chai-subset") : window.chaiSubset;
+var chai = require("chai");
+var chaiSubset = require("chai-subset")
 var expect = chai.expect; chai.use(chaiSubset);
-var Global = isCommonJS ? global : window;
-var lang = isCommonJS ? require("lively.lang") : window.lively.lang;
+var lang = require("lively.lang");
 var fs = require("fs");
 
 var evaluator = require("../lib/evaluator");
