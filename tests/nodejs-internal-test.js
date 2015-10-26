@@ -9,8 +9,8 @@ var internal = require("../lib/nodejs-internal");
 
 describe('nodejs-internal', () => {
 
-  it("can list loaded modules", () => {
-    console.log(internal.loadedModules());
+  xit("can list loaded modules", () => {
+    // console.log(internal.loadedModules());
     expect(internal.loadedModules()).to.include("tests/nodejs-internal-test.js");
   });
 

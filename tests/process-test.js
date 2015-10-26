@@ -6,7 +6,7 @@ var expect = chai.expect; chai.use(chaiSubset);
 var lang = require("lively.lang");
 var fs = require("fs");
 var liveEval = require("../index");
-var p = liveEval.process;
+var p = require("../lib/process");
 
 
 describe('process', function() {
