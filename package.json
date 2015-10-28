@@ -1,6 +1,6 @@
 {
-  "name": "nodejs-live-eval",
-  "version": "0.1.0",
+  "name": "code-pump",
+  "version": "0.1.1",
   "description": "eval / \"repl\" support for nodejs (particular in combination with LivelyWeb)",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/LivelyKernel/nodejs-live-eval.git"
   },
   "keywords": [
-    "LivelyWeb"
+    "LivelyWeb", "dev", "workspace", "live programming", "debugging"
   ],
   "author": "Robert Krahn",
   "license": "MIT",
