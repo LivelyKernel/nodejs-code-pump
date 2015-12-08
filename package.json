@@ -1,6 +1,6 @@
 {
   "name": "code-pump",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "eval / \"repl\" support for nodejs (particular in combination with LivelyWeb)",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "async": "^0.9",
     "callsite": "^1.0.0",
     "lively.lang": "^0.4.12",
-    "lively.vm": "^0.1.6",
+    "lively.vm": "^0.1.7",
     "node-uuid": "^1.4.3",
     "temp": "^0.8.3",
     "websocket": "^1.0.22"

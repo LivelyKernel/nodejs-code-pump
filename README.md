@@ -18,7 +18,7 @@ FILL-ME-OUT
 ### evaluator
 
 ```js
-var e = require("nodejs-code-pump").evaluator;
+var e = require("code-pump").evaluator;
 e.evalIn("./some-module", "internalState.of.module"); // => whatever is stored in there
 ```
 
@@ -26,7 +26,7 @@ e.evalIn("./some-module", "internalState.of.module"); // => whatever is stored i
 ### child process
 
 ```js
-var p = require("nodejs-code-pump").process;
+var p = require("code-pump").process;
 p.startNodejsWorkspace({}, (err, procMgr) => {
   procMgr.sendToChild("eval", {code: "1+2"}, (err, answer) {
     console.log(answer.data.value); // => 3
@@ -40,8 +40,7 @@ p.startNodejsWorkspace({}, (err, procMgr) => {
 server:
 
 ```js
-var s = require("nodejs-code-pump").server;
-server.startServer({port: 9009});
+require("code-pump").start("localhost", 9009);
 ```
 
 client:
