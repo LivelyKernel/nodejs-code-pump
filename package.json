@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/LivelyKernel/nodejs-live-eval#readme",
   "dependencies": {
+    "async": "^0.9",
     "callsite": "^1.0.0",
     "lively.lang": "^0.4.12",
     "lively.vm": "^0.1.6",
