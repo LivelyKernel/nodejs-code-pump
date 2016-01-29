@@ -1,6 +1,6 @@
 {
   "name": "code-pump",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "eval / \"repl\" support for nodejs (particular in combination with LivelyWeb)",
   "main": "index.js",
   "scripts": {
