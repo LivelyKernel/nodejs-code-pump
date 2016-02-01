@@ -11,6 +11,7 @@ var evaluator = require("../lib/evaluator");
 describe('evaluator', function() {
 
   before(() => evaluator.wrapModuleLoad());
+  after(() => evaluator.unwrapModuleLoad());
   beforeEach(() => require("./some-module"));
   afterEach(() => delete require.cache[require.resolve("./some-module")]);
 

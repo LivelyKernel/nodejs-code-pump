@@ -4,7 +4,7 @@ var chai = require("chai");
 var chaiSubset = require("chai-subset")
 var expect = chai.expect; chai.use(chaiSubset);
 var lang = require("lively.lang");
-var internal = require("../lib/nodejs-internal");
+var internal = require("../lib/nodejs/internal");
 
 
 describe('nodejs-internal', () => {
