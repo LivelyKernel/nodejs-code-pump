@@ -1,4 +1,4 @@
-# code-pump
+# code-pump [![Build Status](https://travis-ci.org/LivelyKernel/nodejs-code-pump.svg)](https://travis-ci.org/LivelyKernel/nodejs-code-pump)
 
 Live develop your nodejs app and inspect its state, from a nodejs-workspace in
 [Lively Web](http://lively-web.org)!
