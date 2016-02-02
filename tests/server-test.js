@@ -7,7 +7,7 @@ var expect = chai.expect; chai.use(chaiSubset);
 var Global = isCommonJS ? global : window;
 var lang = isCommonJS ? require("lively.lang") : window.lively.lang;
 
-var evaluator = require("../lib/evaluator");
+var commonJsEvaluator = require("lively.vm").cjs;
 var server = require("../lib/server");
 var WebSocketClient = require('websocket').w3cwebsocket;
 var state = {clients: [], server: null}
@@ -37,7 +37,7 @@ describe('server', function() {
 
   var client, serverMsger;
 
-  before(() => evaluator.wrapModuleLoad());
+  before(() => commonJsEvaluator.wrapModuleLoad());
   beforeEach(done => {
     lang.fun.composeAsync(
       n => lang.fun.waitFor(() => !state.server, n),

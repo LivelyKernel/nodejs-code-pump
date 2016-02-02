@@ -1,6 +1,7 @@
 /*global process, require*/
 
-var evaluator = require("./lib/evaluator");
+var commonJsEvaluator = require("lively.vm").cjs;
+var process = require("./lib/process");
 var server = require("./lib/server");
 var messenger;
 
@@ -9,7 +10,7 @@ function start(host, port, thenDo) {
     return thenDo && thenDo(null, messenger);
   port = port || 9010;
   host = host || "0.0.0.0";
-  evaluator.wrapModuleLoad()
+  commonJsEvaluator.wrapModuleLoad()
   server.startServer({host: host, port: port}, (err, msger) => {
     err && console.error(err);
     messenger = msger;
@@ -29,5 +30,7 @@ function stop(thenDo) {
 module.exports = {
   start: start,
   stop: stop,
-  get messenger() { return messenger; }
+  get messenger() { return messenger; },
+  evaluator: commonJsEvaluator,
+  process: process
 }

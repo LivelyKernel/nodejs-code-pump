@@ -42,12 +42,14 @@ describe('fs-services', function() {
 
   it("finds JS files in dir", done => {
     fsServices.findJSFiles(baseDir, (err, files) => {
-      expect(files).to.to.deep.equal([
+      var expected = [
         {fileName: path.relative(baseDir, file5), path: file5},
         {fileName: path.relative(baseDir, file2), path: file2},
         {fileName: path.relative(baseDir, file3), path: file3},
         {fileName: path.relative(baseDir, file1), path: file1}
-      ]);
+      ];
+      expect(files).to.containSubset(expected);
+      expect(expected).to.containSubset(files);
       done(err);
     });
   });
@@ -88,11 +90,13 @@ describe('fs-services', function() {
   it("can delete files", done => {
     fsServices.removeFile(file5, (err) => {
       fsServices.findJSFiles(baseDir, (err, files) => {
-        expect(files).to.to.deep.equal([
+        const expected = [
           {fileName: path.relative(baseDir, file2), path: file2},
           {fileName: path.relative(baseDir, file3), path: file3},
           {fileName: path.relative(baseDir, file1), path: file1}
-        ]);
+        ];
+        expect(files).to.containSubset(expected);
+        expect(expected).to.containSubset(files);
         done(err);
       });
     });
