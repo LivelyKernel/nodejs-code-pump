@@ -57,9 +57,10 @@ describe('server', function() {
   it("can require a module", function(done) {
     lang.fun.composeAsync(
       n => {
-        client.onmessage = (e) => n();
-        client.sendJSON({action: "eval", data: {code: 'require("./tests/some-module")'}})
+        client.onmessage = e => n(null, e.data),
+        client.sendJSON({action: "eval", data: {code: 'require("' + __dirname + '/some-module")'}});
       },
+      (data, n) => { expect(data).to.not.include("Error"); n(); },
       n => { expect(global.someModuleGlobal).equals(99, "test module not loaded"); n(); }
     )(done);
   });
