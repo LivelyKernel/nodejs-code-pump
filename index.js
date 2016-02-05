@@ -1,7 +1,6 @@
 /*global process, require*/
 
 var commonJsEvaluator = require("lively.vm").cjs;
-var process = require("./lib/process");
 var server = require("./lib/server");
 var messenger;
 
@@ -32,5 +31,5 @@ module.exports = {
   stop: stop,
   get messenger() { return messenger; },
   evaluator: commonJsEvaluator,
-  process: process
+  process: require("./lib/process")
 }
