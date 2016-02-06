@@ -1,6 +1,6 @@
 {
   "name": "code-pump",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "eval / \"repl\" support for nodejs (particular in combination with LivelyWeb)",
   "main": "index.js",
   "bin": "bin/code-pump.js",
@@ -22,8 +22,8 @@
   "homepage": "https://github.com/LivelyKernel/nodejs-live-eval#readme",
   "dependencies": {
     "callsite": "^1.0.0",
-    "lively.lang": "^0.4.12",
-    "lively.vm": "^0.3.1",
+    "lively.lang": "^0.5.7",
+    "lively.vm": "^0.3.2",
     "node-uuid": "^1.4.3",
     "temp": "^0.8.3",
     "websocket": "^1.0.22"

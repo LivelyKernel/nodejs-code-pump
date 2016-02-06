@@ -45,6 +45,7 @@ describe('process', function() {
         (_, n) => setTimeout(n ,500),
         n => procMessenger.sendToChild("eval", {code: "1+2"}, n),
         (answer, n) => {
+          expect(answer).to.not.have.deep.property("data.error");
           expect(answer).deep.property("data.value").equals(3);
           n();
         }
