@@ -41,10 +41,11 @@ function startSubProcess(options) {
   options = lang.obj.merge({host: "0.0.0.0", port: 9010, codeFile: startFile}, options);
 
   var initCode = `
-console.log(__filename);
 var host = "${options.host}",
-    port = ${options.port};
-require("./index").start(host, port, function(err) {
+    port = ${options.port},
+    path = require("path");
+
+require(path.join("${__dirname}", "../index.js")).start(host, port, function(err) {
   if (err) console.error("Code pump error:" + err);
   console.log("code-pump started on %s:%s", host, port);
 });`;
