@@ -1,9 +1,86 @@
 #!/usr/bin/env node
 
-var host = process.argv.slice(2)[0] || "0.0.0.0",
-    port = process.argv.slice(3)[0] || 9010;
+/*
+  Usage
+  ./bin/code-pump.js --host 0.0.0.0 --port 9010
+*/
 
-require("../index").start(host, port, function(err) {
+var fs = require("fs");
+var lang = require("lively.lang");
+var proc = require("../lib/process");
+
+var args = process.argv.slice(2);
+
+if (args.indexOf("--help") > -1 || args.indexOf("-h") > -1) {
+  printUsage();
+  process.exit(0);
+}
+
+var useSubProc = args.indexOf("--no-subprocess") === -1;
+var port = args.indexOf("--port") > -1 ? Number(args[args.indexOf("--port")+1]) : 9010;
+var host = args.indexOf("--host") > -1 ? Number(args[args.indexOf("--host")+1]) : "0.0.0.0";
+
+var currentProcess,
+    startFile = "./code-pump-start.js";
+
+if (!useSubProc) {
+  require("../index").start(host, port, function(err) {
+    if (err) console.error("[code-pump process] error:" + err);
+    console.log("[code-pump process] started on %s:%s", host, port);
+  });
+} else {
+  startSubProcess();
+  process.on("exit", () => fs.unlinkSync(startFile));
+}
+
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+function startSubProcess(options) {
+  options = lang.obj.merge({host: "0.0.0.0", port: 9010, codeFile: startFile}, options);
+
+  var initCode = `
+console.log(__filename);
+var host = "${options.host}",
+    port = ${options.port};
+require("./index").start(host, port, function(err) {
   if (err) console.error("Code pump error:" + err);
   console.log("code-pump started on %s:%s", host, port);
-});
+});`;
+
+  currentProcess = proc.runNode(initCode, [], options)
+    .then(proc => {
+      proc.on("message", (m) => {
+        console.log("[code-pump parent process] got message %s", m);
+        if (m === "restart") { stopSubProcess(); }
+      });
+      proc.on("exit", () => startSubProcess(options));
+      proc.on("exit", () => console.log("[code-pump parent process] exited"));
+      console.log("[code-pump parent process] code pump process started")
+      return proc;
+    })
+}
+
+function stopSubProcess() {
+  return !currentProcess ?
+    Promise.resolve() :
+    currentProcess.then((proc) => {
+      return new Promise((resolve, reject) => {
+        var i = setInterval(() =>  proc.kill("SIGKILL"), 100);
+        proc.on("exit", () => { clearInterval(i); resolve(); });
+      })
+    })
+    .then(() => console.log("[code-pump parent process] stop -> closed"))
+    .catch(console.error());
+}
+
+function printUsage() {
+  var usage = `code-pump usage:
+-h  --help            print this message
+    --port            port to listen for connections, default 9010
+    --port            host to listen for connections, default 0.0.0.0
+    --no-subprocess   don't start the actual loader / evaluator in a subprocess
+`
+  console.log(usage);
+}
