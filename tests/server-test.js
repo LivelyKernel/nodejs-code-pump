@@ -71,10 +71,11 @@ describe('server', function() {
         client.onmessage = (e) => n(null, e.data);
         client.sendJSON({
           action: "eval",
-          data: {module: "./tests/some-module", code: 'internalState'}
+          data: {targetModule: "./tests/some-module", code: 'internalState'}
         });
       },
       (answer, n) => {
+        console.log(answer);
         expect(JSON.parse(answer).data.value).equals(23, "internalState variable not matching");
         n();
       }
