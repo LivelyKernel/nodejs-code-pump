@@ -5,40 +5,42 @@
   ./bin/code-pump.js --host 0.0.0.0 --port 9010
 */
 
-var fs = require("fs");
-var lang = require("lively.lang");
-var proc = require("../lib/process");
-
-var args = process.argv.slice(2);
+var fs = require("fs"),
+    lang = require("lively.lang"),
+    proc = require("../lib/process"),
+    args = process.argv.slice(2);
 
 if (args.indexOf("--help") > -1 || args.indexOf("-h") > -1) {
   printUsage();
   process.exit(0);
 }
 
-var useSubProc = args.indexOf("--no-subprocess") === -1;
-var port = args.indexOf("--port") > -1 ? Number(args[args.indexOf("--port")+1]) : 9010;
-var host = args.indexOf("--host") > -1 ? Number(args[args.indexOf("--host")+1]) : "0.0.0.0";
-
-var currentProcess,
+var useSubProc = args.indexOf("--no-subprocess") === -1,
+    port = args.indexOf("--port") > -1 ? Number(args[args.indexOf("--port")+1]) : 9010,
+    host = args.indexOf("--host") > -1 ? Number(args[args.indexOf("--host")+1]) : "0.0.0.0",
+    currentProcess,
     startFile = "./code-pump-start.js";
 
-if (!useSubProc) {
+if (useSubProc) startSubProcess();
+else {
   require("../index").start(host, port, function(err) {
     if (err) console.error("[code-pump process] error:" + err);
     console.log("[code-pump process] started on %s:%s", host, port);
   });
-} else {
-  startSubProcess();
-  process.on("exit", () => fs.unlinkSync(startFile));
-}
+} 
 
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
+// helpers
 
 function startSubProcess(options) {
-  options = lang.obj.merge({host: "0.0.0.0", port: 9010, codeFile: startFile}, options);
+  options = lang.obj.merge({
+    host: "0.0.0.0",
+    port: 9010,
+    codeFile: startFile,
+    logToFile: "./code-pump.log",
+    autoRestart: true
+  }, options);
 
   var initCode = `
 var host = "${options.host}",
@@ -54,10 +56,16 @@ require(path.join("${__dirname}", "../index.js")).start(host, port, function(err
     .then(proc => {
       proc.on("message", (m) => {
         console.log("[code-pump parent process] got message %s", m);
-        if (m === "restart") { stopSubProcess(); }
+        if (m === "restart") stopSubProcess();
       });
-      proc.on("exit", () => startSubProcess(options));
-      proc.on("exit", () => console.log("[code-pump parent process] exited"));
+      proc.on("exit", () => {
+        if (options.autoRestart) {
+          startSubProcess(options)
+          console.log("[code-pump parent process] restarting")
+        } else {
+          console.log("[code-pump parent process] exited")
+        }
+      });
       console.log("[code-pump parent process] code pump process started")
       return proc;
     })
